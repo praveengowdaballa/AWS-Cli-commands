@@ -1,0 +1,26 @@
+pvcreate /dev/xvdb /dev/xvdc
+    pvdisplay
+     vgcreate vdebs /dev/xvdb /dev/xvdc
+     vgdisplay
+     lvcreate -n lvebs -L 1.9G vgebs
+     lvcreate -n lvebs -L 1.9G vdebs
+     vgdisplay
+     mkfs.ext4 /dev//vdebs/lvebs
+     mkdir /newEBS
+     mount /dev/vdebs/lvebs /newEBS
+     vi /etc/fstab
+     df -h
+     vi /etc/fstab
+     vi /etc/fstab
+     df -hT
+     lsblk
+     pvcreate /dev/xvdd
+     pvdisplay
+     vgextend vdebs /dev/xvdd
+     lvextend -L+0.8G /dev/mapper/vdebs-lvebs
+     resize2fs /dev/mapper/vdebs-lvebs
+     df -hT
+     lsblk
+     dmsetup resume lvebs
+     dmsetup resume /dev/mapper/vdebs-lvebs
+     df -hT
