@@ -1,0 +1,20 @@
+Jenkins Setup : 
+1. Check the java version 
+    $java -version 
+     if its 1.7.x.x then remove the java by running below command
+    $ yum remove java
+
+2. Install Java 1.8
+    yum install java-1.8*
+
+3. Install Jenkins
+   $yum install Jenkins 
+    run $java -version to confirm versin 1.8 is installed
+
+4. On this ec2 instance, Security group .. open one more
+open ssh, hhtp, https and Custom TCP -> Port 8080 -> 0.0.0.0/0
+
+5. run $usermod -a -G root jenkins
+6. Copy the ec2 instance public ip address and paste it in browser  like this http://public-ip-address:8080
+
+7. You should see the Jenkins console. 
