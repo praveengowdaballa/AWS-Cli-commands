@@ -1,0 +1,104 @@
+AWS Autoscaling group configured with ELB and Alarms in Boto (Python)
+AWS, DEVOPS
+23 / JUN / 2016 BY MAYUR RASTOGI 0 COMMENTS
+Share this blog
+EmailTwitterFacebookLinkedInGoogle+
+ boto
+Autoscaling is a service in AWS, which is used to launch or terminate an instance based on user-defined policies, health checks, and schedules.
+There are several ways to configure an auto-scaling group in AWS, here we are focusing on implementing it in python using AWS python module boto.
+Before Creating  an Autoscaling Group  we have to keep in mind the following steps:
+Autoscaling Group: It is a group used for maintaining or scaling a set of EC2 instances in one or more availability zones. It is specific to a single region.
+Launch Configuration: It is the information needed by the Autoscaling group to launch EC2 instances.
+Scaling Policies and Alarms: It is the set of rules for determining when to scale an instance up or down in an autoscaling group.
+Elastic Load Balancing (optional): Add a load balancer to the autoscaling group to distribute traffic and scale instances based on scaling policies.
+20140105144132
+Here we are taking a use case to create an Autoscaling group with ELB and configure scaling policies in which an instance is scaled up when CPU Utilization is greater than 70% and scaled down when CPU utilization is less than 40% over 2 cycles of 60 seconds each.
+Steps to follow:
+Connecting to ELB
+The first step for accessing ELB is to create connections to the service:
+1
+2
+import boto
+conn = boto.connect_elb()
+Getting all Load Balancers
+Retrieve existing load balancer information
+1
+conn.get_all_load_balancers()
+Creating Health Check:
+To create a load balancer we need to have the following information:
+-Specific Port Listeners where ELB will ping to instances.
+-HealthCheck or the ELB concept of a heartbeat. ELB uses this health check to see whether your instances are up or down.
+-A list of Availability Zones.
+1
+2
+3
+import botofrom boto.ec2.elb import HealthCheck
+conn=boto.connect_elb()
+hc=HealthCheck(interval=20,healthy_threshold=2,unhealthy_threshold=4,target='HTTP:80/health')
+Creating Load Balancer
+Creating load balancer with the health check defined above.
+1
+2
+lb=conn.create_load_balancer('my_elb',['us-east-1a','us-east-1b'],[(80, 80, 'http'), (443, 8443, 'tcp')])
+lb.configure_health_check(hc)
+Creating Launch Configuration
+Creating a launch configuration for the Autoscaling group.
+1
+2
+3
+4
+5
+import boto.ec2.autoscale
+from boto.ec2.autoscale import LaunchConfiguration
+conn=boto.ec2.autoscale.connect_to_region("us-east-1",profile_name='selectcloud')
+lc=LaunchConfiguration(name="boto",image_id='ami-id',key_name='key',security_groups=[security_grpid-1,security-grpid-2],instance_type=’t2.small’)
+conn.create_launch_configuration(lc)
+Getting all Autoscaling Groups
+Retrieving existing Autoscaling groups.
+1
+conn.get_all_groups()
+Creating Autoscaling Group
+Creating an autoscaling group with the launch configuration defined above.
+1
+2
+3
+from boto.ec2.autoscale import AutoScalingGroup
+ag=AutoScalingGroup(group_name='boto_group',load_balancers=['myelb1'],availability_zones=['us-east-1c','us-east-1b'],launch_config=lc,min_size=1,max_size=3,connection=conn)
+conn.create_auto_scaling_group(ag)
+To view Activities on Autoscaling Group
+To view activity on an Autoscaling group
+1
+conn.get_all_activities(ag)
+Scaling a Group Up or Down
+Creating scale up and scale down policies with cooldown period of 180
+1
+2
+3
+4
+scale_up_policy=ScalingPolicy(name='scale_up',adjustment_type='ChangeInCapacity',as_name='boto_group',scaling_adjustment=1,cooldown=180)
+scale_down_policy=ScalingPolicy(name='scale_down', adjustment_type='ChangeInCapacity',as_name='boto_group',scaling_adjustment=-1, cooldown=180)
+conn.create_scaling_policy(scale_down_policy)
+conn.create_scaling_policy(scale_up_policy)
+Fetching ARN(Amazon Resource Name)
+1
+2
+scale_down_policy_arn=conn.get_all_policies(as_group='boto_group',policy_names=['scale_down'])[0]
+scale_up_policy_arn=conn.get_all_policies(as_group='boto_group',policy_names=['scale_up'])[0]
+Next, we’ll create CloudWatch alarms that will determine when to run the Auto Scaling Policies.
+1
+2
+3
+4
+5
+6
+7
+8
+from boto.ec2.cloudwatch import MetricAlarm
+import boto.ec2.cloudwatch
+cloudwatch=boto.ec2.cloudwatch.connect_to_region('us-east-1',profile_name='selectcloud')
+alarm_dimensions={"AutoScalingGroupName":"boto_group"}
+scale_down_alarm=MetricAlarm(name='scale_down_cpu',namespace='AWS/EC2',metric='CPUUtilization',statistic='Average',comparison='<',threshold='40',period='60', evaluation_periods=2,alarm_actions=[scale_down_policy_arn.policy_arn],dimensions=alarm_dimensions)
+scale_up_alarm=MetricAlarm(name='scale_up_cpu', namespace='AWS/EC2',metric='CPUUtilization', statistic='Average',comparison='>', threshold='70',period='60', evaluation_periods=2,alarm_actions=[scale_up_policy_arn.policy_arn],dimensions=alarm_dimensions)
+cloudwatch.create_alarm(scale_up_alarm)
+cloudwatch.create_alarm(scale_down_alarm)
+Hope this was useful to you for implementing AWS Autoscaling. The complete Boto script can be downloaded from here for a ready reference.
