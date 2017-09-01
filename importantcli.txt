@@ -1,0 +1,27 @@
+#Listing out instances quickly to run in local webserver and avoid login to console.
+
+aws ec2 describe-instances --region eu-central-1 --query 'Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,IP:PublicIpAddress,PrivIP:PrivateIpAddress,Region:Placement.AvailabilityZone,Key:KeyName,Name:Tags[?Key==`Name`].Value[]}' --filter "Name=instance-state-name,Values=running" --output text > regions.txt
+
+aws ec2 describe-instances --region us-west-1 --query 'Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,IP:PublicIpAddress,PrivIP:PrivateIpAddress,Region:Placement.AvailabilityZone,Key:KeyName,Name:Tags[?Key==`Name`].Value[]}' --filter "Name=instance-state-name,Values=running" --output text >> regions.txt
+
+aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,IP:PublicIpAddress,PrivIP:PrivateIpAddress,Region:Placement.AvailabilityZone,Key:KeyName,Name:Tags[?Key==`Name`].Value[]}' --filter "Name=instance-state-name,Values=running" --output text >> regions.txt
+
+aws ec2 describe-instances --region us-west-2 --query 'Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,IP:PublicIpAddress,PrivIP:PrivateIpAddress,Region:Placement.AvailabilityZone,Key:KeyName,Name:Tags[?Key==`Name`].Value[]}' --filter "Name=instance-state-name,Values=running" --output text >> regions.txt
+
+aws ec2 describe-instances --region eu-west-1 --query 'Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,IP:PublicIpAddress,PrivIP:PrivateIpAddress,Region:Placement.AvailabilityZone,Key:KeyName,Name:Tags[?Key==`Name`].Value[]}' --filter "Name=instance-state-name,Values=running" --output text >> regions.txt
+
+aws ec2 describe-instances --region ap-southeast-2 --query 'Reservations[*].Instances[*].{ID:InstanceId,State:State.Name,IP:PublicIpAddress,PrivIP:PrivateIpAddress,Region:Placement.AvailabilityZone,Key:KeyName,Name:Tags[?Key==`Name`].Value[]}' --filter "Name=instance-state-name,Values=running" --output text >> regions.txt
+
+
+
+echo "REFERENCE" >> regions.txt
+echo "us-west-1 : CALIFORNIA"  >> regions.txt
+echo "us-east-1 : VIRGINIA"  >> regions.txt
+echo "us-west-2 : OREGON"  >> regions.txt
+echo "eu-west-1 : IRELAND"  >> regions.txt
+echo "eu-central-1 : FRANKFURT"  >> regions.txt
+echo "ap-southeast-2 : SYDNEY"  >> regions.txt
+
+
+
+txt2html regions.txt > regions.txt2
