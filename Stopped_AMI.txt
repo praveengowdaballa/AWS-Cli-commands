@@ -1,0 +1,10 @@
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId'  --filter "Name=instance-state-name,Values=stopped" --output text >stoppedamis.txt
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId'  --filter "Name=instance-state-name,Values=stopped,Tags=" --output text >stoppedamis.txt
+
+
+
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId'  --filter "Name=instance-state-name,Values=stopped.Tags=Python"
+
+
+aws ec2 describe-volumes --query 'Volumes[*].{ID:VolumeId,InstanceId:Attachments[0].InstanceId,Availabilityzone:AvailabilityZone,Size:Size}' --output table
+
