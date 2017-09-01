@@ -1,0 +1,11 @@
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value,InstanceId,BlockDeviceMappings[*].Ebs.VolumeId]' --output text
+
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,BlockDeviceMappings[*]].Ebs.VolumeId]' --output table
+
+
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].[BlockDeviceMappings[*].Ebs.VolumeId]' --output text 
+aws ec2 create-snapshot --volume-id vol-1234567890abcdef0 --description "This is my root volume snapshot."
+
+
+
+$ aws ec2 describe-instances --query 'Reservations[*].Instances[*].[Placement.AvailabilityZone, State.Name, InstanceId]' --output text | grep us-west-2a | grep running | awk '{print $3}'
