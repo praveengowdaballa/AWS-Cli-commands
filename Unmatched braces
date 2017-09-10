@@ -1,0 +1,22 @@
+cat test-file-for-brackets.txt | \
+  tr -d '\r\n' | \
+  awk \
+  '
+    BEGIN {
+      B["("]=")";
+      B["["]="]";
+      B["{"]="}"
+    }
+    {
+      m=1;
+      while(m>0)
+      {
+        m=0;
+        for (b in B)
+        {
+          m+=gsub("[" b "][^][(){}]*[" B[b] "]", "", $0)
+        }
+      };
+      print
+    }
+  '
