@@ -1,0 +1,22 @@
+#!/bin/bash
+
+params=""
+export AWS_ACCESS_KEY_ID="AKIAJNTAXSHZN5FXUDMQ"
+export AWS_SECRET_ACCESS_KEY="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"
+
+for arg; do
+        params="$params $arg"
+done
+
+aws $params
+
+
+This is for automatic pulling the aws access keys
+
+# Verify AWS CLI Credentials are setup
+# http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+if ! [ -f ~/.aws/config ]; then
+  if ! [ -f ~/.aws/credentials ]; then
+    fail "AWS config not found or CLI not installed. Please run \"aws configure\"."
+  fi
+fi
