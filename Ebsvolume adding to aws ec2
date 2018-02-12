@@ -1,0 +1,26 @@
+pvcreate /dev/xvdf
+    6  vgcreate vgebs /dev/xvdf
+    7  lvcreate -n lvebs -L 1.9G vgebs
+    8  mkfs.ext4 /dev//vdebs/lvebs
+    9  mkfs.ext4 /dev//vgebs/lvebs
+   10  mkdir /newvolume
+   11  mount /dev/vgebs/lvebs /newvolume
+   12  lsblk
+   13  df -hT
+   14  vi /etc/fstab
+   in fstab file paste this
+   /dev/mapper/vgebs-lvebs         /newvolume      ext4     defaults 0 0
+   
+   
+   15  lsblk
+   16  df -hT
+   17  cat /etc/fstab
+   18  df -hT
+   19  lsblk
+   20  cat /etc/fstab
+   21  mount /dev/vgebs-lvebs /newvolume
+   22  lvdisplay
+   23  mkfs.ext4 /dev//vgebs/lvebs
+   24  mount /dev/vgebs/lvebs /newEBS
+   25  mount /dev/vgebs/lvebs /newvolume
+   26  vi /etc/fstab
