@@ -1,0 +1,443 @@
+Passwd slack Rashmiammuu@22
+
+
+Praveengowda@22                 for aws
+
+Bit bucket
+QZBUB7HSHBGX7VPVRTZ17ULN
+
+
+1. Create New Chef Cookbook
+To create a cookbook, use “knife cookbook create” command as shown below. The following will create a cookbook with name thegeekstuff.
+# knife cookbook create thegeekstuf
+** Creating cookbook thegeekstuff in /root/chef-repo/cookbooks
+** Creating README for cookbook: thegeekstuff
+** Creating CHANGELOG for cookbook: thegeekstuff
+** Creating metadata for cookbook: thegeekstuff
+
+
+For the above command, knife command creates a separate directory called “thegeekstuff” under ~/chef-repo/cookbooks as shown below.
+The following is the cookbook folder structure.
+# ls -l ~/chef-repo/cookbooks/thegeekstuff
+drwxr-xr-x. 2 root root    6 Apr 24 10:15 attributes
+-rw-r--r--. 1 root root  451 Apr 24 10:15 CHANGELOG.md
+drwxr-xr-x. 2 root root    6 Apr 24 10:15 definitions
+drwxr-xr-x. 3 root root   20 Apr 24 10:15 files
+drwxr-xr-x. 2 root root    6 Apr 24 10:15 libraries
+-rw-r--r--. 1 root root  288 Apr 24 10:15 metadata.rb
+drwxr-xr-x. 2 root root    6 Apr 24 10:15 providers
+-rw-r--r--. 1 root root 1497 Apr 24 10:15 README.md
+drwxr-xr-x. 2 root root   23 Apr 24 10:15 recipes
+drwxr-xr-x. 2 root root    6 Apr 24 10:15 resources
+drwxr-xr-x. 3 root root   20 Apr 24 10:15 templates
+
+
+2. Create New Cookbook with Custom Options
+The metadata.rb file under the cookbook directory will have the following default values.
+# cat ~/chef-repo/cookbooks/thegeekstuff/metadata.rb
+name             'thegeekstuff'
+maintainer       'YOUR_COMPANY_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures thegeekstuff'
+long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
+version          '0.1.0'
+
+
+The above values will be used to generate header in any of the .rb files that you create under this cookbook.
+While creating a cookbook, the best practice is to pass the following options.
+knife cookbook create thegeekstuff -C "Ramesh Natarajan" -m "ramesh@thegeekstuff.com" -I gplv3 -r rdoc
+
+
+In the above command:
+-C is the copyright holder name. You can also use –copyright option.
+-m is the email address. You can also use –email option.
+-I is the license type. This will automatically add the appropriate license notice in the files that you create under this cookbook. The following are the valid license types you can use. In this example, we are using gplv3, which will add the GPL v3 license notice in the header. You can also use –license option.
+apachev2 – This will use Apache v2.0
+gplv2 – This option is for GPL v2
+gplv3 – For GPL v3
+mit – For MIT
+none – This option will add this notice to the files: “Proprietary – All Rights Reserved”
+-r option will define the format for the README files in this cookbook. Use “rdoc” option for Ruby docs, and “md” for markdown. Instead of -r you can also use –readme-format
+-o (or –cookbook-path) – This option is used when you want to specify a different directory path where you want the cookbooks to be created. In the above example, we are not using this option.
+3. Upload Cookbook to Chef Server
+The following “knife cookbook upload” command will upload the cookbook that we created above to the Chef server.
+As we see, since this is the first version of this cookbook, it is showing the version number as 0.1.0.
+# knife cookbook upload thegeekstuff
+Uploading thegeekstuff [0.1.0]
+Uploaded 1 cookbook.
+
+
+When you have multiple cookbooks that has multiple versions, you can upload all of your cookbooks using option -a.
+In the following example, we have 4 cookbooks, and the latest version of all these cookbooks are getting uploaded.
+# knife cookbook upload -a
+Uploading dev-cluster    [1.3.0]
+Uploading dev-db         [1.0.0]
+Uploading dev-web        [1.0.0]
+Uploading thegeekstuff   [2.1.0]
+Uploaded all cookbooks.
+
+
+The following command will not only upload “thegeekstuff” cookbook, but it will also upload all the dependent cookbooks.
+knife cookbook upload thegeekstuff -d
+
+
+4. Lock a Cookbook from Future Edits
+When you don’t want anybody else to be modifying a particular cookbook version, use the –freeze option.
+In the following example, after this command, nobody can upload the 2.1.0 version of “thegeekstuff” cookbook anymore. You have to create a new version.
+# knife cookbook upload thegeekstuff --freeze
+Uploading thegeekstuff   [2.1.0]
+Uploaded 1 cookbook.
+
+
+If you are trying to upload the same version, you’ll get the following error message.
+# knife cookbook upload thegeekstuff 
+Uploading thegeekstuff   [2.1.0]
+WARNING: Not updating version constraints for thegeekstuff in the environment as the cookbook is frozen.
+ERROR: Failed to upload 1 cookbook.
+
+
+For some reason, if you want to edit and upload a cookbook that is frozen, use the –force option.
+# knife cookbook upload thegeekstuff --force
+Uploading thegeekstuff   [2.1.0]
+Uploaded 1 cookbook.
+
+
+When you are uploading lot of cookbooks that are big, you can use the –concurrency option. By default this is set to 10. In the following example, we are setting the concurrency to 15 while uploading the cookbook.
+# knife cookbook upload -a --concurrency 15
+
+
+5. Get a List of ALL Cookbooks
+The following “knife cookbook list” command will display all the cookbooks that are available on your Chef server. The 2nd column in the following output is the latest version of that cookbook.
+# knife cookbook list
+dev-cluster    1.3.0
+dev-db         1.0.0
+dev-web        1.0.0
+thegeekstuff   2.1.0
+
+
+To view how many versions are available for the cookbooks, use the -a option which will display ALL versions. You can also use –all option.
+# knife cookbook list -a
+dev-cluster    1.3.0  1.2.0  1.1.0  1.0.0  0.1.1  0.1.0
+dev-db         1.0.0  0.1.0
+dev-web        1.0.0  0.1.0
+thegeekstuff   2.1.0  2.0.0  1.0.0  0.1.0
+
+
+The -w option will display all the cookbook versions along with their corresponding URIs as shown below. You can also use –with-uri option. You can combine -a option with -w as shown below.
+# knife cookbook list -aw
+dev-cluster:
+  0.1.0: https://chef-server/organizations/mycompany/cookbooks/dev-cluster/0.1.0
+  0.1.1: https://chef-server/organizations/mycompany/cookbooks/dev-cluster/0.1.1
+  1.0.0: https://chef-server/organizations/mycompany/cookbooks/dev-cluster/1.0.0
+  1.1.0: https://chef-server/organizations/mycompany/cookbooks/dev-cluster/1.1.0
+  1.2.0: https://chef-server/organizations/mycompany/cookbooks/dev-cluster/1.2.0
+  1.3.0: https://chef-server/organizations/mycompany/cookbooks/dev-cluster/1.3.0
+dev-db:
+  0.1.0: https://chef-server/organizations/mycompany/cookbooks/dev-db/0.1.0
+  1.0.0: https://chef-server/organizations/mycompany/cookbooks/dev-db/1.0.0
+dev-web:
+  0.1.0: https://chef-server/organizations/mycompany/cookbooks/dev-web/0.1.0
+  1.0.0: https://chef-server/organizations/mycompany/cookbooks/dev-web/1.0.0
+thegeekstuff:
+  0.1.0: https://chef-server/organizations/mycompany/cookbooks/thegeekstuff/0.1.0
+  1.0.0: https://chef-server/organizations/mycompany/cookbooks/thegeekstuff/1.0.0
+  2.0.0: https://chef-server/organizations/mycompany/cookbooks/thegeekstuff/2.0.0
+  2.1.0: https://chef-server/organizations/mycompany/cookbooks/thegeekstuff/2.1.0
+
+
+6. Delete a Single Cookbook
+Use the following “knife cookbook delete” command, which will delete the cookbook. In this example, we are deleting “dev-db” cookbook.
+# knife cookbook delete dev-db
+Do you really want to delete starter version 0.1.0? (Y/N) y
+Deleted cookbook[dev-db version 0.1.0]
+
+
+The -p option will delete the cookbook, and permanently purge the cookbook from the Chef server. Use this option with caution.
+# knife cookbook delete dev-db -p
+Files that are common to multiple cookbooks are shared, so purging the files may disable other cookbooks. Are you sure you want to purge files instead of just deleting the cookbook? (Y/N) Y
+Do you really want to delete dev-db version 0.1.0? (Y/N) Y
+Deleted cookbook[dev-db version 0.1.0]
+
+
+7. Delete One (or All) Versions of a Cookbook
+When a cookbook has multiple versions, the delete command will display all the versions and prompt the user to choose either one of the version, or all versions as shown below.
+# knife cookbook delete thegeekstuff
+Which version(s) do you want to delete?
+1. thegeekstuff 2.1.0
+2. thegeekstuff 2.0.0
+3. thegeekstuff 1.0.0
+4. thegeekstuff 0.1.0
+5. All versions
+
+
+In the above example, I choose 1 to delete “thegeekstuff” cookbook with version 2.1.0
+1
+Deleted cookbook[thegeekstuff][2.1.0]
+
+
+You can also specify the version number to delete directly in the command lien as shown below.
+# knife cookbook delete 2.1.0 thegeekstuff
+Do you really want to delete 2.1.0 version thegeekstuff? (Y/N) N
+Deleted cookbook[thegeekstuff][2.1.0]
+
+
+If you want to delete ALL the version of a specific cookbook, use option -a as shown below. You can also use –all instead of -a.
+# knife cookbook delete thegeekstuff -a
+Do you really want to delete all versions of thegeekstuff? (Y/N) Y
+Deleted cookbook[thegeekstuff][2.1.0]
+Deleted cookbook[thegeekstuff][2.0.0]
+Deleted cookbook[thegeekstuff][1.0.0]
+Deleted cookbook[thegeekstuff][0.1.0]
+
+
+8. Delete Multiple Cookbooks using Bulk Delete
+In the following example, we are using “knife cookbook bulk delete” command to delete multiple cookbooks at the same time. You can pass regular-expressions as parameter to this command.
+The following example will delete all the cookbooks that start with “dev-“.
+This this example, we have three cookbooks that matches the given regular expression. But, each of these cookbooks have multiple versions. So, this command will delete all the version of these three cookbooks.
+# knife cookbook bulk delete "^dev-*"
+All versions of the following cookbooks will be deleted:
+dev-cluster  dev-db       dev-web    
+Do you really want to delete these cookbooks? (Y/N) Y
+Deleted cookbook  dev-db                    [1.0.0]
+Deleted cookbook  dev-db                    [0.1.0]
+Deleted cookbook  dev-cluster               [1.3.0]
+Deleted cookbook  dev-cluster               [1.2.0]
+Deleted cookbook  dev-cluster               [1.1.0]
+Deleted cookbook  dev-cluster               [1.0.0]
+Deleted cookbook  dev-cluster               [0.1.1]
+Deleted cookbook  dev-cluster               [0.1.0]
+Deleted cookbook  dev-web                   [1.0.0]
+Deleted cookbook  dev-web                   [0.1.0]
+
+
+9. Download Cookbook from Chef Server
+When you have chef-client installed on multiple machine, and when you want to download a cookbook that someone has modified on your client, then use the “knife cookbook download” command as shown below.
+The following command will download the “dev-db” cookbook from the Chef server to your local machine.
+The cookbook will be downloaded to the current directory. The downloaded cookbook folder will also have the version number appended at the end.
+# knife cookbook download dev-db
+Downloading dev-db cookbook version 0.1.0
+Downloading resources
+Downloading providers
+Downloading recipes
+Downloading definitions
+Downloading libraries
+Downloading attributes
+Downloading files
+Downloading templates
+Downloading root_files
+Cookbook downloaded to /root/chef-repo/dev-db-2.1.0
+
+
+When you are trying to download a cookbook that has multiple versions, it will prompt you to choose a specific version.
+In the following example, since “thegeekstuff” cookbook has multiple versions, it will display the following option, and you can choose one from the list.
+# knife cookbook download thegeekstuff
+Which version do you want to download?
+1. thegeekstuff 0.1.0
+2. thegeekstuff 1.0.0
+3. thegeekstuff 2.0.0
+4. thegeekstuff 2.1.0
+
+
+You can also pass the cookbook version number in the command-line as shown below, to directly download that particular version to your local machine.
+knife cookbook download thegeekstuff 1.0.0
+
+
+If you just want to download the latest version of a cookbook without having to specify a version number, use -N option (or –latest option) as shown bnelow.
+# knife cookbook download thegeekstuff -N
+Downloading thegeekstuff cookbook version 2.1.0
+
+
+When a version of the cookbook that you are downloading has already been downloaded before, you’ll get the following error message.
+# knife cookbook download thegeekstuff 2.1.0
+Downloading thegeekstuff cookbook version 2.1.0
+FATAL: Directory /root/chef-repo/thegeekstuff-2.1.0 exists, use --force to overwrite
+
+
+In that case, use the -f option (or –force) to download the cookbook and overwrite the local directory with the version that was downloaded from the Chef server.
+knife cookbook download thegeekstuff 2.1.0 -f
+
+
+Instead of downloading it under the current directory, you can also specify a download directory using -d option (or –dir option).
+The following command will download “thegeekstuff” version 2.1.0 cookbook to ~/tmp/download directory.
+knife cookbook download thegeekstuff 2.1.0 -d ~/tmp/download/
+
+
+10. Generate Cookbook Metadata
+You can generate metadata file for your cookbook using “knife cookbook metadata” command as shown below. The following command will generate the metadata.rb for all the cookbooks.
+# knife cookbook metadata -a
+Generating metadata for dev-cluster from /root/chef-repo/cookbooks/dev-cluster/metadata.rb
+Generating metadata for dev-db from /root/chef-repo/cookbooks/dev-db/metadata.rb
+Generating metadata for dev-web from /root/chef-repo/cookbooks/dev-web/metadata.rb
+Generating metadata for thegeekstuff from /root/chef-repo/cookbooks/thegeekstuff/metadata.rb
+
+
+If you want to generate metadata only for a specific cookbook, then specify the direct path of the metadata.rb file for that particular cookbook using the “from file” option as shown below.
+The following command will generate metadata for “thegeekstuff” cookbook using the given metadata.rb file.
+# knife cookbook metadata from file ~/chef-repo/cookbooks/thegeekstuff/metadata.rb 
+Generating metadata for thegeekstuff from /root/chef-repo/cookbooks/thegeekstuff/metadata.rb
+
+
+11. View Cookbook Details
+You can view the details of a cookbook using “knife cookbook show” command.
+When you don’t specify a version number for a cookbook, the show command will display list of all the version numbers available for the given cookbook.
+# knife cookbook show thegeekstuff
+thegeekstuff   2.1.0  2.0.0  1.0.0  0.1.0
+
+
+But when you specify a version number, this will display lot more information about the cookbook as shown below.
+# knife cookbook show thegeekstuff 2.1.0
+attributes:
+chef_type:     cookbook_version
+cookbook_name: thegeekstuff
+definitions:
+files:
+frozen?:       false
+json_class:    Chef::CookbookVersion
+libraries:
+metadata:
+  attributes:
+  chef_versions:
+  conflicting:
+  dependencies:
+  description:      Installs/Configures thegeekstuff
+  gems:
+  groupings:
+  issues_url:       
+  license:          GNU Public License 3.0
+  long_description: = thegeekstuff Cookbook
+..
+..
+  checksum:    9a54be168e2b14cdc2a9df3064be3286
+  name:        metadata.rb
+  path:        metadata.rb
+  specificity: default
+  url:         https://chef-server:443/bookshelf/organization-c84c3ff1/checksum-9a54be168e2&Expires=1461804848&Signature=1ofduwz0
+templates:
+version:       2.1.0
+
+
+The default output of the above command will display lot of information.
+You can also specify a section number to the show command as shown below, which will display only that particular section in the show command output.
+For example, the following will display only the “attributes” section from the docker_custom.rb file of “thegeekstuff” cookbook.
+knife cookbook show thegeekstuff 1.2.0 attributes docker_custom.rb
+
+
+The following show command will display only the “recipies” PART (section) from the given .rb file of the “thegeekstuff” cookbook.
+knife cookbook show thegeekstuff 1.2.0 recipies deploy/testserver/tomcat_custom.rb
+
+
+The following are the possible sections that you can pass as a parameter to the above show command.
+attributes
+definitions
+files
+libraries
+providers
+recipes
+resources
+templates
+Also, use -F option to specify a output format for the knife cookbook show command. The following will display the output of the show command in JSON format.
+To view information in JSON format, use the -F common option as part of the command like this:
+knife cookbook show thegeekstuff 2.1.0 -F json
+
+
+The following are the available formats:
+json – for JSON format
+text – for plain text
+yaml – Standard YAML format
+pp – Post processing format
+12. Validate Cookbook Syntax
+The following “knife cookbook test” command will do a syntax check validation on the cookbook files.
+In the following example, we have an error in “thegeekstuff” cookbook. As you see in the last line, it says that the method “author” in the metadata.rb file is undefined and not recognized by Chef.
+# knife cookbook test thegeekstuff
+checking thegeekstuff
+ERROR: knife encountered an unexpected error
+This may be a bug in the 'cookbook test' knife command or plugin
+Please collect the output of this command with the `-VV` option before filing a bug report.
+Exception: NoMethodError: undefined method `author' for #<Chef::Cookbook::Metadata:0x00000002a0a030>
+
+
+Once the syntax error is fixed, we’ll see the following output indicating that our cookbook passed all the syntax verification.
+# knife cookbook test thegeekstuff
+checking thegeekstuff
+Running syntax check on thegeekstuff
+Validating ruby files
+Validating templates
+
+
+If you get this “WARNING: DEPRECATED: Please use ChefSpec or Rubocop to syntax-check cookbooks.” in the above output, you can ignore it.
+To do a validation on all the cookbooks using the -a option (or –all option) as shown below.
+# knife cookbook test -a
+Running syntax check on dev-cluster
+Running syntax check on dev-db
+Running syntax check on dev-web
+Running syntax check on thegeekstuff
+..
+Chef Cheat Sheet: The Basics
+Posted on March 11, 2016, 11:58 am by Dan
+The big data repository known as Chef Server is manipulated with a tool called knife. The general (simplified) syntax for this tool is:
+1
+$ knife category command item
+The category can be one of: environment, client, node, data bag, cookbook, … The full list can be found here.
+The command (usually) is one of create, list, show, edit or delete. There are more commands, though, depending on what is being requested through knife.
+On the cheat sheat itself, let’s start with some classics:
+Nodes and Environments
+1
+2
+$ knife environment list
+$ knife environment edit xxxx
+
+1
+2
+$ knife node list
+$ knife node edit yyyy
+Data Bags
+As you may already know, data bags are stored in a 2 layer structure, thus allowing for simple categorization (e.g. grouping data bags by service or by environment). Some simple commands dealing with them may be:
+1
+2
+3
+$ knife data bag list xxdomain
+$ knife data bag show xxdomain yyleaf
+$ knife data bag edit xxdomain yyleaf
+One can create a data bag with the editor or by providing a source file:
+1
+2
+$ knife data bag create xxdomain yyleaf
+$ knife data bag from file xxdomain file.json
+The file may look like:
+1
+2
+3
+4
+5
+{
+  "id": "yyleaf",
+  "key": "value",
+  ...
+}
+Finding nodes and environments
+Very basic stuff:
+1
+2
+$ knife environment list | grep xxenv
+$ knife node list | grep xxnode
+The node search above works if we know something about the node name; this may not always be the case. In an ideal scenario, nodes have names prefixed with the environment they belong to – this makes listing nodes by environment a trivial task by using some construct derived from the commands above. But when this is not the case:
+1
+$ knife search "chef_environment:xxenv"
+NB: the search command returns a “summary” output. If one is interested in the node name alone, some output trimming must be performed:
+1
+$ knife search "chef_environment:xxenv" -a "name" 2>/dev/null | grep "name" | awk '{print $2}'
+Running commands on multiple nodes
+The basic way to do it is to capture the search result and run ssh on every node:
+1
+2
+$ nodes=$(knife search "chef_environment:xxenv" -a "fqdn" 2>/dev/null | grep "fqdn" | awk '{print $2}')
+$ for n in $nodes ; do ssh $n "zzcommand" ; done
+One may improve it in a shell script in order to run the ssh commands in parallel and wait for their result; either way, it’s overengineering. The simple way to achieve such thing is:
+1
+$ knife ssh "chef_environment:xxenv" "zzcommand"
+The search query can get even more complicated, allowing for complex queries to target individual nodes by their configuration:
+1
+$ knife ssh "chef_environment:xxenv AND recipe:xxrecp" "zzcommand"
+… and from here, the sky is the limit. Thank you for your read!
+
