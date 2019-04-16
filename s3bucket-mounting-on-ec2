@@ -1,0 +1,21 @@
+   yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+   yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+   yum remove fuse fuse-s3fs
+   yum install gcc libstdc++-devel gcc++ curl-devel libxml2-devel openssl-devel mailcap git ntp fuse s3fs-fuse
+   yum install ntpupdate
+   yum install ntp
+   ntpdate -q pool.ntp.org
+   echo AKIAJT476E5MWEAUN6HA:TqSDhsPmeJoD8DqAJSmrWZUDUo9VWtZOHzhCtIUg > ~/.passwd-s3fs
+   chmod 600 ~/.s3passwd
+   cd ~
+   ls -a
+   chmodd 600 .passwd-s3fs
+   chmod 600 .passwd-s3fs
+   cd -
+   mkdir -p /mnt/s3 /tmp/s3cache
+   chmod 777 /mnt/s3 /tmp/s3cache
+   aws s3 ls
+   s3fs -o use_cache=/tmp/s3cache s3fusemount /mnt/s3
+   df -hT
+s3 fstab entries
+s3fusemount /mnt/s3 fuse.s3fs passwd_file=/root/.passwd-s3fs,allow_other,use_cache=/tmp/s3cache 0 0
