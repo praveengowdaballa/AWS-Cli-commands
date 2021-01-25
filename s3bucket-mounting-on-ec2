@@ -19,3 +19,34 @@
    df -hT
 s3 fstab entries
 s3fusemount /mnt/s3 fuse.s3fs passwd_file=/root/.passwd-s3fs,allow_other,use_cache=/tmp/s3cache 0 0
+
+Role Mount
+
+Mounting S3 bucket to Linux S3 enables you to provide scalable object storage for large files in Linux Instances
+
+# Install FUSE Packages
+yum -y install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel
+git clone https://github.com/s3fs-fuse/s3fs-fus...​
+cd s3fs-fuse
+./autogen.sh
+./configure
+make
+make install
+
+# Ensure you have an IAM Role with Full Access to S3
+
+# Create the Mountpoint
+mkdir -p /var/s3fs-demo-fs
+
+# Target Bucket
+aws s3 mb s3://s3fs-demo-bkt
+
+# Mount the S3 Bucket as filesystem
+s3fs s3fs-demo-bkt /var/s3fs-demo-fs -o iam_role=ec2-to-s3 
+
+# Verify with Command
+df -h /var/s3fs-demo-fs
+
+# Create Object
+cd /var/s3fs-demo-fs
+touch "Thanks-for-Watching"
